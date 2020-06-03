@@ -49,26 +49,22 @@ class Recorder():
     sample_format = pyaudio.paInt16 
     channels = 2
     fs = 44100
-    # sentence_counter = 0 #đếm câu
+    sentence_counter = 0 #đếm câu
     
     frames = []  
     def __init__(self, master):
         self.isrecording = False
         self.text = tk.StringVar()
-        self.text.set("Please record!")
+        self.text.set("sentence #0")
         
         self.label = tk.Label(master, textvariable=self.text)
         self.button1 = tk.Button(master, text='rec',command=self.start_recording, padx=50)
         self.button2 = tk.Button(master, text='stop',command=self.stop_recording, padx=50)
-        self.button3 = tk.Button(master, text='predict',command=self.predict, padx=50)
         self.button2["state"] = "disabled"
-        self.button3['state'] = 'disabled'
-        self.filename = 'speech.wav'
         
         self.label.pack()
         self.button1.pack()
         self.button2.pack()
-        self.button3.pack()
         
 
     def start_recording(self):
@@ -77,22 +73,24 @@ class Recorder():
         self.isrecording = True
         self.button1["state"] = "disabled"
         self.button2["state"] = "normal"
-        self.button3["state"] = "disabled"
         
         print('Recording')
         t = threading.Thread(target=self.record)
         t.start()
-        self.text.set('Recording...')
     
-    # def change_label(self):
-    #     self.text.set('Predicted: ' + self.predict_word)
+    def change_label(self): #đổi số câu
+        # self.text.set("sentence #"+str(self.sentence_counter))
+        self.text.set(self.predict_word)
 
     def stop_recording(self):
         self.isrecording = False
         print('recording complete')
         self.button1["state"] = "normal"
         self.button2["state"] = "disable"
-        self.button3["state"] = "normal"
+        
+        self.filename= "sentence" + str(self.sentence_counter) + ".wav" #tên file
+        self.sentence_counter = self.sentence_counter + 1
+        # self.change_label()
         
         wf = wave.open(self.filename, 'wb')
         wf.setnchannels(self.channels)
@@ -101,15 +99,11 @@ class Recorder():
         wf.writeframes(b''.join(self.frames))
         wf.close()
         self.frames = [] #reset lại dữ liệu ghi âm
-        self.text.set('Finished recording!')
+
         #file
         # testfile = get_class_data('./')
         # testfile = list([kmeans.predict(testfile).reshape(-1, 1)])
 
-        
-    
-    def predict(self):
-        #code predict
         testset1 = {}
         n_test1 = {}
         class_names = ['bệnh nhân', 'chúng ta', 'có thể', 'người','Việt Nam']
@@ -130,8 +124,8 @@ class Recorder():
                 print(true_cname, score, 'predict:', max(score, key=score.get))
                 self.predict_word = max(score, key=score.get)
 
-        self.text.set('Predicted: ' + self.predict_word)
-
+        self.change_label()
+        
     def record(self):
         while self.isrecording:
             data = self.stream.read(self.chunk)
