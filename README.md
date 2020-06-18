@@ -1,4 +1,4 @@
 # voice-processing-hmm
-bài tập môn xử lý tiếng nói - HMM training
-Code & tham số của các model: hmms.ipynb
-App nhận dạng từ: record.py
+bài tập môn xử lý tiếng nói - HMM training </br>
+Code & tham số của các model: hmms.ipynb </br>
+App nhận dạng từ: record.py </br>
